@@ -1,0 +1,46 @@
+<!DOCTYPE html> 
+{% load tags %}
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+    <title>Cassad: {% block title %} picture viewer {% endblock %}</title> 
+    <script type="text/javascript" src="{% media "cassad/js/jquery-1.4.2.js" %}"></script>
+{% block head %}{% endblock %}
+</head> 
+ 
+<body> 
+<div id="content"> 
+
+{% block content %}
+{% endblock %}
+</div> 
+{% if debug %}
+<div id="debug"> 
+    <p> 
+        {{ sql_queries|length }} Queries
+        {% ifnotequal sql_queries|length 0 %}
+        (<span style="cursor: pointer;" onclick="document.getElementById('debugQueryTable').style.display='';">Show</span>)
+        {% endifnotequal %}
+    </p> 
+    <table id="debugQueryTable" style="display: none;"> 
+        <col width="1"/> 
+        <col/> 
+        <col width="1"/> 
+        <thead> 
+        <tr> 
+            <th scope="col">#</th> 
+            <th scope="col">SQL</th> 
+            <th scope="col">Time</th> 
+        </tr> 
+        </thead> 
+        <tbody> 
+        {% for query in sql_queries %}<tr class="{% cycle odd,even %}"> 
+            <td>{{ forloop.counter }}</td> 
+            <td>{{ query.sql }}</td> 
+            <td>{{ query.time }}</td> 
+        </tr>{% endfor %}
+        </tbody> 
+    </table> 
+</div> 
+{% endif %}
+</body> 
+</html> 
