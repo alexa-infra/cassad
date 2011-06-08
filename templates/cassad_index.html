@@ -8,4 +8,9 @@ $(document).ready(function(){
 {% endblock %}
 {% block content %}
     Hello world!
+<ul>
+    {% for p in pictures %}
+        <li>{{ p.path }}</li>
+    {% endfor %}
+</ul>
 {% endblock %}

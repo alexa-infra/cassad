@@ -2,7 +2,7 @@ from django.db import models
 import base64
 
 class Picture(models.Model):
-    path = models.CharField('local path to picture', max_length=200, primary_key=True)
+    path = models.CharField('local path to picture', max_length=200)
     hashcode = models.CharField('hash of file', max_length=200, blank=True)
     timestamp = models.DateTimeField('time of file creation')
     tags = models.ManyToManyField('Tag')
