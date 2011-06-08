@@ -1,4 +1,7 @@
-import models
+import entries
+
+from mongoengine import *
+connect("cassad")
 
 def render_to_response(request, template_name, context_dict, **kwargs):
     from django.template import RequestContext
@@ -7,7 +10,7 @@ def render_to_response(request, template_name, context_dict, **kwargs):
     return _render_to_response(template_name, context_instance=context, **kwargs)
 
 def index(request, template_name):
-    pictures = models.Picture.objects.all()
+    pictures = entries.Picture.objects.all()
     return render_to_response(request, template_name, {
             'pictures': pictures
         })
