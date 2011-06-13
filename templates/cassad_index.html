@@ -2,15 +2,54 @@
 {% block head %}
 <script type="text/javascript">
 $(document).ready(function(){
-    alert('hello there');
 })
+var last = "{{ last }}";
+$(window).scroll(function(){
+    if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+        $.ajax({
+            type: "GET",
+            url: "/cassad/search/" + last,
+            timeout: 15000,
+            success: function(d) {
+                last = d.last;
+                var pack = $("<ul class='imagepack'></ul>")
+                for(var i=0; i<d.pictures.length; i++) {
+                    pack.append(
+                        "<li class='thumb'><img class='image' src='/thumbnails/" + d.pictures[i].thumb + "' /><div class='overlay-bottom'>" + d.pictures[i].width + "x" + d.pictures[i].height + "<br/>" + d.pictures[i].creation + "</div></li>"
+                    );
+                }
+                $(".imagepack:last").after(pack)
+            }
+        });
+    }
+});
+
+$(".thumb").live('click', function(){
+    var pthis = $(this)
+    var selected = pthis.hasClass("selected")
+    if (!selected)
+        pthis.addClass("selected")
+    else
+        pthis.removeClass("selected")
+});
+
+$(".thumb").live('mouseenter', function(){ $(this).find(".overlay-bottom").toggle(); });
+$(".thumb").live('mouseleave', function(){ $(this).find(".overlay-bottom").toggle(); });
+
 </script>
+<style type="text/css">
+.thumb { display:inline-block; margin:10px; border: solid 2px #1e1e1e; position: relative; }
+.image { vertical-align: middle; border: solid 2px #FFFAF2; }
+.imagepack { list-style-type: none; text-align: center; }
+.selected { border: solid 2px red; }
+.overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 2em; }
+body { background: #1E1E1E; color: #C6C6C6; }
+</style>
 {% endblock %}
 {% block content %}
-    Hello world!
-<ul>
+<ul class="imagepack">
     {% for p in pictures %}
-        <li>{{ p.path }}</li>
+        <li class="thumb"><img class="image" src="/thumbnails/{{ p.thumb }}"/><div class="overlay-bottom">{{ p.width }}x{{ p.height }}</div></li>
     {% endfor %}
 </ul>
 {% endblock %}
