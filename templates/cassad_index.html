@@ -2,54 +2,117 @@
 {% block head %}
 <script type="text/javascript">
 $(document).ready(function(){
+    bind_scroll()
 })
 var last = "{{ last }}";
-$(window).scroll(function(){
-    if ($(window).scrollTop() == $(document).height() - $(window).height()) {
-        $.ajax({
-            type: "GET",
-            url: "/cassad/search/" + last,
-            timeout: 15000,
-            success: function(d) {
-                last = d.last;
-                var pack = $("<ul class='imagepack'></ul>")
-                for(var i=0; i<d.pictures.length; i++) {
-                    pack.append(
-                        "<li class='thumb'><img class='image' src='/thumbnails/" + d.pictures[i].thumb + "' /><div class='overlay-bottom'>" + d.pictures[i].width + "x" + d.pictures[i].height + "<br/>" + d.pictures[i].creation + "</div></li>"
-                    );
-                }
-                $(".imagepack:last").after(pack)
+
+function bind_scroll() {
+    $(window).bind('scroll', function() {
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) { 
+            $(window).unbind('scroll')
+            request_next_page(bind_scroll)
+        }
+    }) 
+}
+
+function request_next_page(callback) {
+    $.ajax({
+        type: "GET",
+        url: "{{ callback }}" + last,
+        timeout: 15000,
+        success: function(d) {
+            last = d.last;
+            var pack = $("<ul class='imagepack'></ul>")
+            for(var i=0; i<d.pictures.length; i++) {
+                var p = d.pictures[i]
+                var buf = []
+                buf.push("<li class='thumb' thumb_id='" + p.id + "' tags='" + p.tags + "'>")
+                var s = p.width > p.height ? "wi" : "hi";
+                buf.push("<img class='image " + s + "' src='/thumbnails/" + p.thumb + "' />")
+                buf.push("<div class='overlay overlay-top'></div>")
+                buf.push("<div class='overlay overlay-bottom'>")
+                buf.push(p.width + "x" + p.height)
+                buf.push("</div>")
+                buf.push("</li>")
+                
+                var elem_html = buf.join('')
+                pack.append(elem_html)
             }
-        });
+            $(".imagepack:last").after(pack)
+            callback()
+        }
+    });
+}
+
+$(".image").live('click', function(){
+    var thumb = $(this).parent('.thumb')
+    thumb.toggleClass('selected')
+});
+
+$(".thumb").live('mouseenter', function(){ $(this).find(".overlay").toggle(); });
+$(".thumb").live('mouseleave', function(){ $(this).find(".overlay").toggle(); });
+
+$(".overlay-bottom").live('click', function() {
+
+    if ($('.selected').length == 0) {
+        $(this).parent().addClass('selected')
     }
-});
+    
+    var tags = []
+    $('.selected').each(function(index, elem) {
+        var elem_tags = $(elem).attr('tags').split(',')
+        for (var i=0; i<elem_tags.length; i++) {
+            var t = elem_tags[i]
+            if (tags.indexOf(t) == -1)
+                tags.push(t)
+        }
+    })
+    $('#taginput').val(tags.join(','))
 
-$(".thumb").live('click', function(){
-    var pthis = $(this)
-    var selected = pthis.hasClass("selected")
-    if (!selected)
-        pthis.addClass("selected")
-    else
-        pthis.removeClass("selected")
-});
+    $(this).parent().append($('#tagdialog'))
+    $("#tagdialog").show()
+})
 
-$(".thumb").live('mouseenter', function(){ $(this).find(".overlay-bottom").toggle(); });
-$(".thumb").live('mouseleave', function(){ $(this).find(".overlay-bottom").toggle(); });
+$('#tagcancel').live('click', function() { $("#tagdialog").hide() })
+$('#tagsave').live('click', function() {
+    $('#tagdialog').hide()
+
+    var tags = $('#taginput').val()
+    var selected = []
+    $('.selected').each(function(index, elem) {
+        selected.push($(elem).attr("thumb_id"))
+        $(elem).attr('tags', tags)
+    })
+    $.ajax({
+        type: "GET",
+        data: "selected=" + selected.join(',') + "&" + "tags=" + tags,
+        url: "/cassad/addtags",
+        timeout: 15000,
+        success: function(d) {
+            $('.selected').removeClass('selected')
+        }
+    })
+})
+
 
 </script>
 <style type="text/css">
 .thumb { display:inline-block; margin:10px; border: solid 2px #1e1e1e; position: relative; }
 .image { vertical-align: middle; border: solid 2px #FFFAF2; }
+.wi { width:120px; } .hi { height:120px; }
 .imagepack { list-style-type: none; text-align: center; }
 .selected { border: solid 2px red; }
-.overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 2em; }
+.overlay-top { background: red; position: absolute; width: 10px; height: 10px; top: 0; right: 0; display: none; }
+.overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 1.2em; }
 body { background: #1E1E1E; color: #C6C6C6; }
+#tagdialog { display: none; position: absolute; z-index: 50; left: 10%; bottom: 20%; width: 80%; }
 </style>
 {% endblock %}
 {% block content %}
+<div id="tagdialog"><input type="text" id="taginput"><br /><button type="button" id="tagsave">save</button><button type="button" id="tagcancel">cancel</button></div>
 <ul class="imagepack">
     {% for p in pictures %}
-        <li class="thumb"><img class="image" src="/thumbnails/{{ p.thumb }}"/><div class="overlay-bottom">{{ p.width }}x{{ p.height }}</div></li>
+        <li class="thumb" thumb_id="{{ p.id }}" tags="{{ p.tags }}"><img class="image {% if p.width > p.height %}wi{% else %}hi{% endif %}" src="/thumbnails/{{ p.thumb }}"/><div class="overlay overlay-top"></div><div class="overlay overlay-bottom">{{ p.width }}x{{ p.height }}</div></li>
     {% endfor %}
 </ul>
 {% endblock %}

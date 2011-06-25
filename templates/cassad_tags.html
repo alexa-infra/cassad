@@ -1,0 +1,13 @@
+{% extends "cassad_base.html" %}
+{% block head %}
+<script type="text/javascript">
+</script>
+<style type="text/css">
+body { background: #1E1E1E; color: #C6C6C6; }
+</style>
+{% endblock %}
+{% block content %}
+<ul>
+{% for tag, freq in tags.items %}<li><a href="/cassad/tags/{{ tag }}/">{{ tag }}</a> - {{ freq }}</li>{% endfor %}
+</ul>
+{% endblock %}
