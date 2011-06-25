@@ -3,19 +3,13 @@ import os
 from django.http import HttpResponse
 from django.utils import simplejson
 from bson.objectid import ObjectId
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from datetime import datetime
 import time
 from django.views.decorators.http import require_POST
+from django.shortcuts import render
 
 from mongoengine import *
 connect("cassad")
-
-def render_to_response(request, template_name, context_dict, **kwargs):
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response as _render_to_response
-    context = RequestContext(request, context_dict)
-    return _render_to_response(template_name, context_instance=context, **kwargs)
 
 class JSONResponse(HttpResponse):
     def __init__(self, data, **kwargs):
@@ -32,7 +26,6 @@ def convert(entry_list):
             "id": str(p.id),
             "width": p.width,
             "height":p.height,
-            "creation":time.mktime(p.creation.timetuple()),
             "tags": ",".join(p.tags)
             } for p in entry_list if p.thumbnail ]
 
@@ -43,22 +36,17 @@ def convert(entry_list):
         res["last"] = ""
     return res
 
-#def make_query():
-#    return entries.Picture.objects.order_by("-creation")
+def tagmeview(request, template_name, callback):
+    return render(request, template_name, { 'callback': callback })
 
-def index(request, template_name, num=80):
-    res_list = entries.Picture.ranged({ "tags__size": 0 }, None, num, "-creation")
-
-    res = convert(res_list)
-    res["callback"] = "/cassad/search/"
-    return render_to_response(request, template_name, res)
-
-def search(request, last, num=30):
-    last_el = entries.Picture.objects.get(id=ObjectId(last))
-    res_list = entries.Picture.ranged({ "tags__size": 0 }, last_el.creation, num, "-creation")
+def tagme(request, last=None, num=30):
+    if last:
+        last_el = entries.Picture.objects.get(id=ObjectId(last))
+        res_list = entries.Picture.ranged({ "tags__size": 0 }, last_el.creation, num, "-creation")
+    else:
+        res_list = entries.Picture.ranged({ "tags__size": 0 }, None, num, "-creation")
 
     res = convert(res_list)
-
     return JSONResponse(res)
 
 def addtags(request):
@@ -79,15 +67,15 @@ def addtags(request):
 
 def tags(request, template_name):
     res = entries.Picture.objects.item_frequencies('tags')
-    return render_to_response(request, template_name,  { 'tags': res })
+    return render(request, template_name,  { 'tags': res })
 
-def showtags(request, template_name, tag, last=None, num=30):
+def showtagview(request, template_name, tag, callback):
+    return render(request, template_name, { 'callback': callback, 'tag': tag })
+
+def showtag(request, tag, last=None, num=30):
     if not last:
-        entry_list = entries.Picture.ranged({ "tags" : tag }, None, 80, "-creation")
-        res = convert(entry_list)
-        res["callback"] = "/cassad/tags/" + tag + "/"
-        return render_to_response(request, template_name, res)
+        entry_list = entries.Picture.ranged({ "tags" : tag }, None, num, "-creation")
     else:
         last_el = entries.Picture.objects.get(id=ObjectId(last))
         entry_list = entries.Picture.ranged({ "tags" : tag }, last_el.creation, num, "-creation")
-        return JSONResponse(convert(entry_list))
+    return JSONResponse(convert(entry_list))

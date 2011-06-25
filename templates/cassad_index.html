@@ -2,9 +2,9 @@
 {% block head %}
 <script type="text/javascript">
 $(document).ready(function(){
-    bind_scroll()
+    request_next_page(bind_scroll)
 })
-var last = "{{ last }}";
+var last = "";
 
 function bind_scroll() {
     $(window).bind('scroll', function() {
@@ -38,8 +38,12 @@ function request_next_page(callback) {
                 var elem_html = buf.join('')
                 pack.append(elem_html)
             }
-            $(".imagepack:last").after(pack)
-            callback()
+            if ($('.imagepack').length == 0)
+                $('body').append(pack)
+            else
+                $(".imagepack:last").after(pack)
+            if (last != '')
+                callback()
         }
     });
 }
@@ -63,7 +67,7 @@ $(".overlay-bottom").live('click', function() {
         var elem_tags = $(elem).attr('tags').split(',')
         for (var i=0; i<elem_tags.length; i++) {
             var t = elem_tags[i]
-            if (tags.indexOf(t) == -1)
+            if ((tags.indexOf(t) == -1)&&(t.length > 0))
                 tags.push(t)
         }
     })
@@ -110,9 +114,4 @@ body { background: #1E1E1E; color: #C6C6C6; }
 {% endblock %}
 {% block content %}
 <div id="tagdialog"><input type="text" id="taginput"><br /><button type="button" id="tagsave">save</button><button type="button" id="tagcancel">cancel</button></div>
-<ul class="imagepack">
-    {% for p in pictures %}
-        <li class="thumb" thumb_id="{{ p.id }}" tags="{{ p.tags }}"><img class="image {% if p.width > p.height %}wi{% else %}hi{% endif %}" src="/thumbnails/{{ p.thumb }}"/><div class="overlay overlay-top"></div><div class="overlay overlay-bottom">{{ p.width }}x{{ p.height }}</div></li>
-    {% endfor %}
-</ul>
 {% endblock %}
