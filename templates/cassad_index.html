@@ -26,7 +26,8 @@ function request_next_page(callback) {
             for(var i=0; i<d.pictures.length; i++) {
                 var p = d.pictures[i]
                 var buf = []
-                buf.push("<li class='thumb' thumb_id='" + p.id + "' tags='" + p.tags + "'>")
+                var cc = p.tags.length > 0 ? 'thumb tagged' : 'thumb'
+                buf.push("<li class='" + cc + "' thumb_id='" + p.id + "' tags='" + p.tags + "'>")
                 var s = p.width > p.height ? "wi" : "hi";
                 buf.push("<img class='image " + s + "' src='/thumbnails/" + p.thumb + "' />")
                 buf.push("<div class='overlay overlay-top'></div>")
@@ -98,6 +99,23 @@ $('#tagsave').live('click', function() {
     })
 })
 
+$('.overlay-top').live('click', function() {
+    var selected = []
+    $('.selected').each(function(index, elem) {
+        selected.push($(elem).attr("thumb_id"))
+    })
+    $.ajax({
+        type: "GET",
+        data: "selected=" + selected.join(','),
+        url: "/cassad/delete",
+        timeout: 15000,
+        success: function(d) {
+            $('.selected').remove()
+        }
+    })
+})
+
+
 
 </script>
 <style type="text/css">
@@ -106,6 +124,8 @@ $('#tagsave').live('click', function() {
 .wi { width:120px; } .hi { height:120px; }
 .imagepack { list-style-type: none; text-align: center; }
 .selected { border: solid 2px red; }
+/*.tagged { border: solid 2px blue; }
+.tagged.selected { border: solid 2px red; }*/
 .overlay-top { background: red; position: absolute; width: 10px; height: 10px; top: 0; right: 0; display: none; }
 .overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 1.2em; }
 body { background: #1E1E1E; color: #C6C6C6; }

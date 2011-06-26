@@ -42,11 +42,19 @@ def tagmeview(request, template_name, callback):
 def tagme(request, last=None, num=30):
     if last:
         last_el = entries.Picture.objects.get(id=ObjectId(last))
-        res_list = entries.Picture.ranged({ "tags__size": 0 }, last_el.creation, num, "-creation")
+        res_list = entries.Picture.ranged({ 'tags__size': 0 }, last_el.creation, num, "-creation")
     else:
-        res_list = entries.Picture.ranged({ "tags__size": 0 }, None, num, "-creation")
+        res_list = entries.Picture.ranged({ 'tags__size': 0 }, None, 80, "-creation")
 
     res = convert(res_list)
+
+#    last_entries = entries.Picture.objects.filter(hashcode=res["last"])
+#    if len(last_entries) > 1:
+#        conv_last = convert(last_entries)
+#        for p in conv_last['pictures']:
+#            if p not in res['pictures']:
+#                res['pictures'].append(p)
+
     return JSONResponse(res)
 
 def addtags(request):
@@ -74,8 +82,32 @@ def showtagview(request, template_name, tag, callback):
 
 def showtag(request, tag, last=None, num=30):
     if not last:
-        entry_list = entries.Picture.ranged({ "tags" : tag }, None, num, "-creation")
+        res_list = entries.Picture.ranged({ "tags__in" : [tag], "tags__nin": ["deleted"] }, None, 80, "-creation")
     else:
         last_el = entries.Picture.objects.get(id=ObjectId(last))
-        entry_list = entries.Picture.ranged({ "tags" : tag }, last_el.creation, num, "-creation")
-    return JSONResponse(convert(entry_list))
+        res_list = entries.Picture.ranged({ "tags__in" : [tag], "tags__nin": ["deleted"] }, last_el.creation, num, "-creation")
+
+    res = convert(res_list)
+
+#    last_entries = entries.Picture.objects.filter(hashcode=res["last"])
+#    if len(last_entries) > 1:
+#        conv_last = convert(last_entries)
+#        for p in conv_last['pictures']:
+#            if p not in res['pictures']:
+#                res['pictures'].append(p)
+
+    return JSONResponse(res)
+
+def delete(request):
+    selected = request.GET.get("selected", None)
+    if not selected:
+        return JSONResponse({})
+    ids = selected.split(',')
+    objs = [ObjectId(x) for x in ids]
+    entry_list = entries.Picture.objects(id__in=objs)
+
+    for p in entry_list:
+        p.tags.append("deleted")
+        p.save()
+    return JSONResponse({ "res": "OK" })
+

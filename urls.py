@@ -9,5 +9,6 @@ urlpatterns = patterns('cassad',
     (r'^tags/$', views.tags, { 'template_name': 'cassad_tags.html' }),
     (r'^tags/(?P<tag>[^\/]+)/$', views.showtagview,
         { 'template_name': 'cassad_index.html', 'callback': 'show/' }),
-    (r'^tags/(?P<tag>[^\/]+)/show/(?P<last>.*)$', views.showtag, {})
+    (r'^tags/(?P<tag>[^\/]+)/show/(?P<last>.*)$', views.showtag, {}),
+    (r'^delete/?$', views.delete, {})
 )

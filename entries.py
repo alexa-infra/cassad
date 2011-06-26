@@ -37,22 +37,34 @@ class Picture(Document):
         super(Picture, self).save()
 
     @staticmethod
-    def ranged(request, fr=None, num=30, order='creation'):
+    def ranged(request, last=None, num=30, order='creation', last_field=None):
         query = Q(**request)
-        asc = order[0] != '-'
-        if fr:
+
+        if order[0] == '-':
+            asc = False
+            order = order[1:]
+        elif order[0] == '+':
+            asc = True
+            order = order[1:]
+        else:
+            asc = True
+
+        if last:
+            if not last_field:
+                last_field = order
+
             if asc:
-                fromreq = { '%s__gt' % order : fr }
+                fromreq = { '%s__gt' % last_field : last }
             else:
-                fromreq = { '%s__lt' % order[1:] : fr }
+                fromreq = { '%s__lt' % last_field : last }
             query = Q(**fromreq) & query
 
         if asc:
             startsort = '-%s' % order
             endsort = order
         else:
-            startsort = order[1:]
-            endsort = order
+            startsort = order
+            endsort = '-%s' % order
 
         return Picture.objects.order_by(startsort).filter(query).order_by(endsort).limit(num)
 
