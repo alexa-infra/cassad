@@ -39,8 +39,9 @@ function request_next_page(callback) {
                 var elem_html = buf.join('')
                 pack.append(elem_html)
             }
+
             if ($('.imagepack').length == 0)
-                $('body').append(pack)
+                $('#content').append(pack)
             else
                 $(".imagepack:last").after(pack)
             if (last != '')
@@ -57,11 +58,11 @@ $(".image").live('click', function(){
 $(".thumb").live('mouseenter', function(){ $(this).find(".overlay").toggle(); });
 $(".thumb").live('mouseleave', function(){ $(this).find(".overlay").toggle(); });
 
-$(".overlay-bottom").live('click', function() {
+$("#tag-button").live('click', function() {
 
-    if ($('.selected').length == 0) {
-        $(this).parent().addClass('selected')
-    }
+//    if ($('.selected').length == 0) {
+//        $(this).parent().addClass('selected')
+//    }
     
     var tags = []
     $('.selected').each(function(index, elem) {
@@ -74,7 +75,7 @@ $(".overlay-bottom").live('click', function() {
     })
     $('#taginput').val(tags.join(','))
 
-    $(this).parent().append($('#tagdialog'))
+//    $(this).parent().append($('#tagdialog'))
     $("#tagdialog").show()
 })
 
@@ -99,11 +100,15 @@ $('#tagsave').live('click', function() {
     })
 })
 
-$('.overlay-top').live('click', function() {
+$('#del-button').live('click', function() {
     var selected = []
     $('.selected').each(function(index, elem) {
         selected.push($(elem).attr("thumb_id"))
     })
+    if (selected.length == 0)
+        return false;
+    if (!confirm('Are you sure you want to delete selected items?'))
+        return false;
     $.ajax({
         type: "GET",
         data: "selected=" + selected.join(','),
@@ -122,10 +127,13 @@ $('.overlay-top').live('click', function() {
 .thumb { display:inline-block; margin:10px; border: solid 2px #1e1e1e; position: relative; }
 .image { vertical-align: middle; border: solid 2px #FFFAF2; }
 .wi { width:120px; } .hi { height:120px; }
-.imagepack { list-style-type: none; text-align: center; }
+.imagepack { list-style-type: none; text-align: center; padding: 20px 0 0 2em; }
 .selected { border: solid 2px red; }
 /*.tagged { border: solid 2px blue; }
 .tagged.selected { border: solid 2px red; }*/
+#manage { position: fixed; left: 0; top: 40%; width: 1.5em; text-align: center; height: 7em; line-height: 1em; }
+#del-button { position: relative; margin: 0; padding: 0.25em; background: blue; }
+#tag-button { position: relative; margin: 0; padding: 0.25em; background: red; }
 .overlay-top { background: red; position: absolute; width: 10px; height: 10px; top: 0; right: 0; display: none; }
 .overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 1.2em; }
 body { background: #1E1E1E; color: #C6C6C6; }
@@ -133,5 +141,9 @@ body { background: #1E1E1E; color: #C6C6C6; }
 </style>
 {% endblock %}
 {% block content %}
+<div id="manage">
+    <div id="tag-button">T A G</div>
+    <div id="del-button">D E L</div>
+</div>
 <div id="tagdialog"><input type="text" id="taginput"><br /><button type="button" id="tagsave">save</button><button type="button" id="tagcancel">cancel</button></div>
 {% endblock %}

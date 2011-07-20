@@ -23,6 +23,9 @@ for root, subfolders, files in os.walk(rootdir):
     for f in files:
         filename = os.path.join(root, f)
         try:
+            if entries.Picture.objects.filter(path=filename).count() > 0:
+                continue
+
             img = Image.open(filename)
             ts = os.path.getctime(filename)
             creation = datetime.fromtimestamp(ts)
@@ -34,6 +37,10 @@ for root, subfolders, files in os.walk(rootdir):
             p.creation = creation
             p.width, p.height = img.size
             p.size = size
+
+            if entries.Picture.objects.filter(hashcode=sha).count() > 0:
+                p.tags = ['deleted']
+
             p.save()
 
             fname = os.path.basename(filename)
@@ -56,4 +63,5 @@ for root, subfolders, files in os.walk(rootdir):
 
             print filename, size, img.format, img.size, img.mode, creation, sha
         except:
+            print 'ERROR with %s' % filename
             pass

@@ -40,11 +40,15 @@ def tagmeview(request, template_name, callback):
     return render(request, template_name, { 'callback': callback })
 
 def tagme(request, last=None, num=30):
-    if last:
-        last_el = entries.Picture.objects.get(id=ObjectId(last))
-        res_list = entries.Picture.ranged({ 'tags__size': 0 }, last_el.creation, num, "-creation")
+    if not last:
+        from_value = None
+        show_number = 80
     else:
-        res_list = entries.Picture.ranged({ 'tags__size': 0 }, None, 80, "-creation")
+        last_el = entries.Picture.objects.get(id=ObjectId(last))
+        from_value = last_el.creation
+        show_number = num
+
+    res_list = entries.Picture.ranged({ 'tags__size': 0 }, from_value, show_number, "-creation")
 
     res = convert(res_list)
 
@@ -82,11 +86,19 @@ def showtagview(request, template_name, tag, callback):
 
 def showtag(request, tag, last=None, num=30):
     if not last:
-        res_list = entries.Picture.ranged({ "tags__in" : [tag], "tags__nin": ["deleted"] }, None, 80, "-creation")
+        from_value = None
+        show_number = 80
     else:
         last_el = entries.Picture.objects.get(id=ObjectId(last))
-        res_list = entries.Picture.ranged({ "tags__in" : [tag], "tags__nin": ["deleted"] }, last_el.creation, num, "-creation")
+        from_value = last_el.creation
+        show_number = num
 
+    if tag == 'deleted':
+        res_list = entries.Picture.ranged({ "tags__in" : [tag] },
+            from_value, show_number, "-creation")
+    else:
+        res_list = entries.Picture.ranged({ "tags__in" : [tag], "tags__nin": ["deleted"] },
+            from_value, show_number, "-creation")
     res = convert(res_list)
 
 #    last_entries = entries.Picture.objects.filter(hashcode=res["last"])
