@@ -37,7 +37,8 @@ def convert(entry_list):
     return res
 
 def tagmeview(request, template_name, callback):
-    return render(request, template_name, { 'callback': callback })
+    tags = entries.Picture.objects.item_frequencies('tags')
+    return render(request, template_name, { 'callback': callback, 'tags': tags })
 
 def tagme(request, last=None, num=30):
     if not last:
@@ -82,7 +83,8 @@ def tags(request, template_name):
     return render(request, template_name,  { 'tags': res })
 
 def showtagview(request, template_name, tag, callback):
-    return render(request, template_name, { 'callback': callback, 'tag': tag })
+    tags = entries.Picture.objects.item_frequencies('tags')
+    return render(request, template_name, { 'callback': callback, 'tag': tag, 'tags': tags })
 
 def showtag(request, tag, last=None, num=30):
     if not last:
@@ -123,3 +125,7 @@ def delete(request):
         p.save()
     return JSONResponse({ "res": "OK" })
 
+def image(request, id):
+    p = entries.Picture.objects.get(id=ObjectId(id))
+    image_data = open(p.path, "rb").read()
+    return HttpResponse(image_data, mimetype="image/jpeg")
