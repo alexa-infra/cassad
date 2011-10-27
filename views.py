@@ -28,7 +28,6 @@ def convert(entry_list):
             "height":p.height,
             "tags": ",".join(p.tags)
             } for p in entry_list if p.thumbnail ]
-
     }
     if len(res['pictures']) > 0:
         res["last"] = res['pictures'][-1]['id']
