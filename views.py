@@ -7,6 +7,7 @@ from datetime import datetime
 import time
 from django.views.decorators.http import require_POST
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
 
 from mongoengine import *
 connect("cassad")
@@ -59,6 +60,19 @@ def tagme(request, last=None, num=30):
 #            if p not in res['pictures']:
 #                res['pictures'].append(p)
 
+    return JSONResponse(res)
+
+def whole(request, last=None, num=30):
+    if not last:
+        from_value = None
+        show_number = 80
+    else:
+        last_el = entries.Picture.objects.get(id=ObjectId(last))
+        from_value = last_el.hashcode
+        show_number = num
+
+    res_list = entries.Picture.ranged({ 'tags__nin': ["deleted"] }, from_value, show_number, "hashcode")
+    res = convert(res_list)
     return JSONResponse(res)
 
 def addtags(request):
@@ -123,6 +137,12 @@ def delete(request):
         p.tags.append("deleted")
         p.save()
     return JSONResponse({ "res": "OK" })
+
+def showimage(request, template_name, id):
+    p = entries.Picture.objects.get(id=ObjectId(id))
+    return render(request, template_name, { 'image': p,
+            'wpurl': reverse('image-content', args=[id,])
+        })
 
 def image(request, id):
     p = entries.Picture.objects.get(id=ObjectId(id))

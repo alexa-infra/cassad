@@ -4,10 +4,11 @@
 </script>
 <style type="text/css">
 body { background: #1E1E1E; color: #C6C6C6; }
+.tag { color: white; font-weight: bold; padding: 2px; }
 </style>
 {% endblock %}
 {% block content %}
 <ul>
-{% for tag, freq in tags.items %}<li><a href="/cassad/tags/{{ tag }}/">{{ tag }}</a> - {{ freq }}</li>{% endfor %}
+{% for tag, freq in tags.items %}<li><a class="tag" href="/cassad/tags/{{ tag }}/">{{ tag }}</a> - {{ freq }}</li>{% endfor %}
 </ul>
 {% endblock %}

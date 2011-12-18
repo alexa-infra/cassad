@@ -3,6 +3,8 @@
 {% block head %}
 <script type="text/javascript" src="{% media "cassad/js/jquery.colorbox.js" %}"></script>
 <link type="text/css" rel="stylesheet" href="{% media "cassad/colorbox.css" %}" />
+<script type="text/javascript" src="{% media "cassad/js/jquery.ui.core.js" %}"></script>
+<script type="text/javascript" src="{% media "cassad/js/jquery.scrollfollow.js" %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     request_next_page(bind_scroll)
@@ -33,7 +35,7 @@ function request_next_page(callback) {
                 var cc = p.tags.length > 0 ? 'thumb tagged' : 'thumb'
                 buf.push("<li class='" + cc + "' thumb_id='" + p.id + "' tags='" + p.tags + "'>")
                 var s = p.width > p.height ? "wi" : "hi";
-                var factor = Math.min(120 / p.width, 120 / p.height)
+                var factor = Math.min(200 / p.width, 200 / p.height)
                 var w = p.width * factor
                 var h = p.height * factor
                 buf.push("<img class='image' src='/thumbnails/" + p.thumb + "' style='width:" + w + "px;height:" + h +"px' />")
@@ -46,9 +48,11 @@ function request_next_page(callback) {
                 var elem_html = buf.join('')
                 pack.append(elem_html)
             }
+            var brick = $("<div class='brick'><a href='" + window.location + last + "'>Page</a></div>")
+            pack.append(brick)
 
             if ($('.imagepack').length == 0)
-                $('#content').append(pack)
+                $('#page').append(pack)
             else
                 $(".imagepack:last").after(pack)
             if (last != '')
@@ -129,6 +133,10 @@ $('#del-button').live('click', function() {
     })
 })
 
+$('#clean-button').live('click', function() {
+    $('.imagepack:not(:last)').remove()
+})
+
 $(function() {
     $('.tag').click(function() {
         var text = $('#taginput').val();
@@ -149,22 +157,26 @@ $('.overlay-top').live('click', function(){
 .image { vertical-align: middle; border: solid 2px #FFFAF2; }
 .imagepack { list-style-type: none; text-align: center; padding: 20px 0 0 2em; }
 .selected { border: solid 2px red; }
-/*.tagged { border: solid 2px blue; }
-.tagged.selected { border: solid 2px red; }*/
-#manage { position: fixed; left: 0; top: 40%; width: 1.5em; text-align: center; height: 7em; line-height: 1em; }
-#del-button { position: relative; margin: 0; padding: 0.25em; background: blue; }
-#tag-button { position: relative; margin: 0; padding: 0.25em; background: red; }
+.tagged { border: solid 2px blue; }
+.tagged.selected { border: solid 2px red; }
+#manage { position: fixed; left: 0; top: 40%; width: 1.5em; text-align: center; height: 10em; line-height: 1em; }
+.manage-button { position: relative; margin: 0; padding: 0.25em; }
+#del-button { background: blue; }
+#tag-button { background: red; }
+#clean-button { background: blue; }
 .overlay-top { background: red; position: absolute; width: 10px; height: 10px; top: 0; right: 0; display: none; }
 .overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 1.2em; }
 body { background: #1E1E1E; color: #C6C6C6; }
 #tagdialog { width: 300px; height: 300px; }
 .tag { background: blue; color: white; padding: 2px; margin: 2px; float: left; }
+.brick { background: black; color: #66666; width: 100%; height: 30px; }
 </style>
 {% endblock %}
 {% block content %}
 <div id="manage">
-    <div id="tag-button">T A G</div>
-    <div id="del-button">D E L</div>
+    <div class="manage-button" id="clean-button">C L E</div>
+    <div class="manage-button" id="tag-button">T A G</div>
+    <div class="manage-button" id="del-button">D E L</div>
 </div>
 <div style="display:none;">
 <div id="tagdialog">
