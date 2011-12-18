@@ -9,9 +9,6 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 
-from mongoengine import *
-connect("cassad")
-
 class JSONResponse(HttpResponse):
     def __init__(self, data, **kwargs):
         defaults = {
