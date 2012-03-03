@@ -65,10 +65,10 @@ def whole(request, last=None, num=30):
         show_number = 80
     else:
         last_el = entries.Picture.objects.get(id=ObjectId(last))
-        from_value = last_el.hashcode
+        from_value = last_el.creation
         show_number = num
 
-    res_list = entries.Picture.ranged({ 'tags__nin': ["deleted"] }, from_value, show_number, "hashcode")
+    res_list = entries.Picture.ranged({ 'tags__nin': ["deleted"] }, from_value, show_number, "-creation")
     res = convert(res_list)
     return JSONResponse(res)
 

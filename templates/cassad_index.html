@@ -5,10 +5,13 @@
 <link type="text/css" rel="stylesheet" href="{% media "cassad/colorbox.css" %}" />
 <script type="text/javascript" src="{% media "cassad/js/jquery.ui.core.js" %}"></script>
 <script type="text/javascript" src="{% media "cassad/js/jquery.scrollfollow.js" %}"></script>
+<script type="text/javascript" src="{% media "cassad/bootstrap.js" %}"></script>
+<link type="text/css" rel="stylesheet" href="{% media "cassad/bootstrap.css" %}" />
 <script type="text/javascript">
 $(document).ready(function(){
     request_next_page(bind_scroll)
     $('#tag-button').colorbox({inline: 'true', width: '50%', href: '#tagdialog'});
+    $('#taginput').typeahead({ source: ["{{ tags|join:'", "' }}"], items: 5, });
 })
 var last = "";
 
