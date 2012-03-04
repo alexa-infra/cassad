@@ -42,7 +42,7 @@ function request_next_page(callback) {
                 var factor = Math.min(200 / p.width, 200 / p.height)
                 var w = p.width * factor
                 var h = p.height * factor
-                buf.push("<img class='image' src='/thumbnails/" + p.thumb + "' style='width:" + w + "px;height:" + h +"px' />")
+                buf.push("<img class='image' src='/cassad/thumbnails/" + p.thumb + "' style='width:" + w + "px;height:" + h +"px' />")
                 buf.push("<div class='overlay overlay-top'></div>")
                 buf.push("<div class='overlay overlay-bottom'>")
                 buf.push(p.width + "x" + p.height)

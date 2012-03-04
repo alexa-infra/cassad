@@ -1,12 +1,12 @@
 {% extends "cassad_base.html" %}
 {% load tags %}
 {% block head %}
-<script type="text/javascript" src="{% media "cassad/js/jquery.colorbox.js" %}"></script>
-<link type="text/css" rel="stylesheet" href="{% media "cassad/colorbox.css" %}" />
-<script type="text/javascript" src="{% media "cassad/bootstrap.js" %}"></script>
-<link type="text/css" rel="stylesheet" href="{% media "cassad/bootstrap.css" %}" />
-<script type="text/javascript" src="{% media "cassad/app.js"%}"></script>
-<link type="test/css" rel="stylesheet" href="{% media "cassad/app.css" %}" />
+<script type="text/javascript" src="{% media "js/jquery.colorbox.js" %}"></script>
+<link type="text/css" rel="stylesheet" href="{% media "colorbox.css" %}" />
+<script type="text/javascript" src="{% media "bootstrap.js" %}"></script>
+<link type="text/css" rel="stylesheet" href="{% media "bootstrap.css" %}" />
+<script type="text/javascript" src="{% media "app.js"%}"></script>
+<link type="test/css" rel="stylesheet" href="{% media "app.css" %}" />
 <script type="text/javascript">
 var tag_list = ["{{ tags|join:'", "' }}"];
 var callback_url = "{{ callback }}";
