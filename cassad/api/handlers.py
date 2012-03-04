@@ -6,12 +6,13 @@ from mongoengine import *
 
 class PictureNotTagged(BaseHandler):
     allowed_methods = ('GET',)
+    fields = ('id', 'tags', 'creation', 'width', 'height', 'size', 'thumbnail')
 
     def read(self, request):
         from_value = request.GET.get('from', None)
         show_number = request.GET.get('num', 30)
         res_list = Picture.ranged({ 'tags__size': 0 }, from_value, show_number, "-creation")
-        return SerializedObject(res_list).to_python()
+        return SerializedObject(res_list, fields=self.fields).to_python()
 
 class PictureNotDeleted(BaseHandler):
     allowed_methods = ('GET',)

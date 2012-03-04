@@ -28,13 +28,13 @@ function bind_scroll() {
 function request_next_page(callback) {
     $.ajax({
         type: "GET",
-        url: callback_url + last,
+        url: callback_url + '?from=' + last,
         timeout: 15000,
         success: function(d) {
-            last = d.last;
+            last = d[d.length-1].creation;
             var pack = $("<ul class='imagepack'></ul>")
-            for(var i=0; i<d.pictures.length; i++) {
-                var p = d.pictures[i]
+            for(var i=0; i<d.length; i++) {
+                var p = d[i]
                 var buf = []
                 var cc = p.tags.length > 0 ? 'thumb tagged' : 'thumb'
                 buf.push("<li class='" + cc + "' thumb_id='" + p.id + "' tags='" + p.tags + "'>")
@@ -42,7 +42,9 @@ function request_next_page(callback) {
                 var factor = Math.min(200 / p.width, 200 / p.height)
                 var w = p.width * factor
                 var h = p.height * factor
-                buf.push("<img class='image' src='/cassad/thumbnails/" + p.thumb + "' style='width:" + w + "px;height:" + h +"px' />")
+                var path_tokens = p.thumbnail.split('/')
+                var path = path_tokens[path_tokens.length-1]
+                buf.push("<img class='image' src='/cassad/thumbnails/" + path + "' style='width:" + w + "px;height:" + h +"px' />")
                 buf.push("<div class='overlay overlay-top'></div>")
                 buf.push("<div class='overlay overlay-bottom'>")
                 buf.push(p.width + "x" + p.height)
