@@ -12,6 +12,17 @@ $(document).ready(function(){
     request_next_page(bind_scroll)
     $('#tag-button').colorbox({inline: 'true', width: '50%', href: '#tagdialog'});
     $('#taginput').typeahead({ source: ["{{ tags|join:'", "' }}"], items: 5, });
+    $('#tagform').submit(function() {
+        var val = $('#taginput').val();
+        if (val.length == 0)
+            return false;
+        var tag = $('<div/>');
+        tag.attr('class', 'taglive');
+        tag.text(val);
+        $('#taglivebar').append(tag);
+        $('#taginput').val('');
+        return false;
+    });
 })
 var last = "";
 
@@ -74,10 +85,6 @@ $(".thumb").live('mouseleave', function(){ $(this).find(".overlay").toggle(); })
 
 $("#tag-button").live('click', function() {
 
-//    if ($('.selected').length == 0) {
-//        $(this).parent().addClass('selected')
-//    }
-    
     var tags = []
     $('.selected').each(function(index, elem) {
         var elem_tags = $(elem).attr('tags').split(',')
@@ -86,11 +93,17 @@ $("#tag-button").live('click', function() {
             if ((tags.indexOf(t) == -1)&&(t.length > 0))
                 tags.push(t)
         }
-    })
-    $('#taginput').val(tags.join(','))
-
-//    $(this).parent().append($('#tagdialog'))
-//    $("#tagdialog").show()
+    });
+    var taglivebar = $('#taglivebar');
+    taglivebar.children().remove();
+    for (var i=0; i<tags.length; i++) {
+        var tagelem = $('<div />');
+        tagelem.attr('class', 'taglive');
+        tagelem.text(tags[i]);
+        taglivebar.append(tagelem);
+    }
+    $('#taginput').focus();
+//    $('#taginput').val(tags.join(','))
 })
 
 $('#tagcancel').live('click', function() {
@@ -99,7 +112,12 @@ $('#tagcancel').live('click', function() {
 $('#tagsave').live('click', function() {
     $.colorbox.close();
 
-    var tags = $('#taginput').val()
+    var tags = [];
+    $('#taglivebar').children().each(function(idx, elem) {
+        tags.push($(elem).text());
+    });
+    tags = tags.join(', ');
+//    var tags = $('#taginput').val()
     var selected = []
     $('.selected').each(function(index, elem) {
         selected.push($(elem).attr("thumb_id"))
@@ -142,16 +160,27 @@ $('#clean-button').live('click', function() {
 
 $(function() {
     $('.tag').click(function() {
-        var text = $('#taginput').val();
-        if (text.length > 0)
-            text += ", ";
-        $('#taginput').val(text + $(this).text());
+//        var text = $('#taginput').val();
+//        if (text.length > 0)
+//            text += ", ";
+//        $('#taginput').val(text + $(this).text());
+        var val = $(this).text();
+        var tag = $('<div/>');
+        tag.attr('class', 'taglive');
+        tag.text(val);
+        $('#taglivebar').append(tag);
+
     });
 });
 
 $('.overlay-top').live('click', function(){
     var id = $(this).parents('.thumb').attr('thumb_id');
     window.open('/cassad/image/' + id, '_blank');
+});
+
+$('.taglive').live('click', function(){
+    var pthis = $(this);
+    pthis.remove();
 });
 
 </script>
@@ -172,7 +201,9 @@ $('.overlay-top').live('click', function(){
 body { background: #1E1E1E; color: #C6C6C6; }
 #tagdialog { width: 300px; height: 300px; }
 .tag { background: blue; color: white; padding: 2px; margin: 2px; float: left; }
+.taglive { background: red; color: white; padding: 2px; margin: 2px; float: left; }
 .brick { background: black; color: #66666; width: 100%; height: 30px; }
+.dropdown-menu { z-index: 9999; }
 </style>
 {% endblock %}
 {% block content %}
@@ -185,7 +216,13 @@ body { background: #1E1E1E; color: #C6C6C6; }
 <div id="tagdialog">
     <ul style="list-style-type: none;">
         <li>
-            <input type="text" id="taginput" style="width: 100%;">
+            <div id="taglivebar"></div>
+        </li>
+        <li>
+            <form id="tagform"  action="">
+                <input type="text" id="taginput" style="width: 100%;" />
+                <input type="submit" value="Go" style="display: none;" />
+            </form>
         </li>
         <li>
             <button type="button" id="tagsave">save</button>
