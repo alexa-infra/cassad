@@ -1,0 +1,20 @@
+.thumb { display:inline-block; margin:10px; border: solid 2px #1e1e1e; position: relative; }
+.image { vertical-align: middle; border: solid 2px #FFFAF2; }
+.imagepack { list-style-type: none; text-align: center; padding: 20px 0 0 2em; }
+.selected { border: solid 2px red; }
+.tagged { border: solid 2px blue; }
+.tagged.selected { border: solid 2px red; }
+#manage { position: fixed; left: 0; top: 40%; width: 1.5em; text-align: center; height: 10em; line-height: 1em; }
+.manage-button { position: relative; margin: 0; padding: 0.25em; }
+#del-button { background: blue; }
+#tag-button { background: red; }
+#clean-button { background: blue; }
+.overlay-top { background: red; position: absolute; width: 10px; height: 10px; top: 0; right: 0; display: none; }
+.overlay-bottom { background: #0A0A0A; position: absolute; width: 100%; bottom: 0; display: none; height: 1.2em; }
+body { background: #1E1E1E; color: #C6C6C6; }
+#tagdialog { width: 300px; height: 300px; }
+.tag { background: blue; color: white; padding: 2px; margin: 2px; float: left; }
+.taglive { background: red; color: white; padding: 2px; margin: 2px; float: left; }
+.brick { background: black; color: #66666; width: 100%; height: 30px; }
+.dropdown-menu { z-index: 9999; }
+
