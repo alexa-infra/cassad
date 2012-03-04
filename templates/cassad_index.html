@@ -3,8 +3,6 @@
 {% block head %}
 <script type="text/javascript" src="{% media "cassad/js/jquery.colorbox.js" %}"></script>
 <link type="text/css" rel="stylesheet" href="{% media "cassad/colorbox.css" %}" />
-<script type="text/javascript" src="{% media "cassad/js/jquery.ui.core.js" %}"></script>
-<script type="text/javascript" src="{% media "cassad/js/jquery.scrollfollow.js" %}"></script>
 <script type="text/javascript" src="{% media "cassad/bootstrap.js" %}"></script>
 <link type="text/css" rel="stylesheet" href="{% media "cassad/bootstrap.css" %}" />
 <script type="text/javascript">
@@ -103,7 +101,6 @@ $("#tag-button").live('click', function() {
         taglivebar.append(tagelem);
     }
     $('#taginput').focus();
-//    $('#taginput').val(tags.join(','))
 })
 
 $('#tagcancel').live('click', function() {
@@ -117,7 +114,6 @@ $('#tagsave').live('click', function() {
         tags.push($(elem).text());
     });
     tags = tags.join(', ');
-//    var tags = $('#taginput').val()
     var selected = []
     $('.selected').each(function(index, elem) {
         selected.push($(elem).attr("thumb_id"))
@@ -160,10 +156,6 @@ $('#clean-button').live('click', function() {
 
 $(function() {
     $('.tag').click(function() {
-//        var text = $('#taginput').val();
-//        if (text.length > 0)
-//            text += ", ";
-//        $('#taginput').val(text + $(this).text());
         var val = $(this).text();
         var tag = $('<div/>');
         tag.attr('class', 'taglive');
@@ -228,10 +220,12 @@ body { background: #1E1E1E; color: #C6C6C6; }
             <button type="button" id="tagsave">save</button>
             <button type="button" id="tagcancel">cancel</button>
         </li>
+        <li>
+            {% for t in tags %}
+                <div class="tag">{{ t }}</div>
+            {% endfor %}
+        </li>
     </ul>
-    {% for t in tags %}
-        <div class="tag">{{ t }}</div>
-    {% endfor %}
 </div>
 </div>
 {% endblock %}
