@@ -18,4 +18,5 @@ urlpatterns = patterns('',
     (r'^image/(?P<id>.*)/$', views.showimage, { 'template_name': 'cassad_wp.html' }, 'image-display'),
     (r'^image-content/(?P<id>.*)/$', views.image, {}, 'image-content'),
     url(r"^thumbnails/(?P<path>.*)$", "django.views.static.serve", { "document_root":settings.THUMBNAIL_DIR }),
+    (r'^api/', include('cassad.api.urls')),
 )
