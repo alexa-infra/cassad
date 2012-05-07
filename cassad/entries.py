@@ -37,9 +37,7 @@ class Picture(Document):
         super(Picture, self).save()
 
     @staticmethod
-    def ranged(request, last=None, num=30, order='creation', last_field=None):
-        query = Q(**request)
-
+    def ranged(query, last=None, num=30, order='creation', last_field=None):
         if order[0] == '-':
             asc = False
             order = order[1:]

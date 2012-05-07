@@ -11,7 +11,7 @@ class PictureNotTagged(BaseHandler):
     def read(self, request):
         from_value = request.GET.get('from', None)
         show_number = request.GET.get('num', 30)
-        res_list = Picture.ranged({ 'tags__size': 0 }, from_value, show_number, "-creation")
+        res_list = Picture.ranged(Q(tags__size=0) | Q(tags__exists=False), from_value, show_number, "-creation")
         return SerializedObject(res_list, fields=self.fields).to_python()
 
 class PictureNotDeleted(BaseHandler):
@@ -20,7 +20,7 @@ class PictureNotDeleted(BaseHandler):
     def read(self, request):
         from_value = request.GET.get('from', None)
         show_number = request.GET.get('num', 30)
-        res_list = Picture.ranged({ 'tags__nin': ["deleted"] }, from_value, show_number, "-creation")
+        res_list = Picture.ranged(Q(tags__nin=["deleted"]), from_value, show_number, "-creation")
         return SerializedObject(res_list).to_python()
 
 class PictureTagged(BaseHandler):
@@ -30,8 +30,8 @@ class PictureTagged(BaseHandler):
         from_value = request.GET.get('from', None)
         show_number = request.GET.get('num', 30)
         if tag == 'deleted':
-            res_list = Picture.ranged({ "tags__in" : [tag] }, from_value, show_number, "-creation")
+            res_list = Picture.ranged(Q(tags__in=[tag]), from_value, show_number, "-creation")
         else:
-            res_list = Picture.ranged({ "tags__in" : [tag], "tags__nin": ["deleted"] }, from_value, show_number, "-creation")
+            res_list = Picture.ranged(Q(tags__in=[tag]) & Q(tags__nin=["deleted"]), from_value, show_number, "-creation")
         return SerializedObject(res_list).to_python()
 

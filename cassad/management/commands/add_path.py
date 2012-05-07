@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 filename = os.path.join(root, f)
                 try:
                     if Picture.objects.filter(path=filename).count() == 0:
-                       self.process_file(filename)
+                        self.process_file(filename)
                 except:
                     print 'ERROR with %s' % filename
                     pass
@@ -78,8 +78,8 @@ class Command(BaseCommand):
 
         mode = img.format
         s = (w, h)
-        img.thumbnail(s)
-        img.save(tname, mode)
+        thumbnail = img.resize(s, Image.ANTIALIAS)
+        thumbnail.save(tname, mode)
 
         p.thumbnail = tname
         p.save()
