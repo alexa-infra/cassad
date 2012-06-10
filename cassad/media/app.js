@@ -122,6 +122,10 @@ $('#tagsave').live('click', function() {
 	processData: false,
         timeout: 15000,
         success: function(d) {
+	    if (tags.length > 0)
+	    	$('.selected').addClass('tagged')
+	    else
+	    	$('.selected').removeClass('tagged')
             $('.selected').removeClass('selected')
         }
     })
