@@ -107,16 +107,17 @@ $('#tagsave').live('click', function() {
     $('#taglivebar').children().each(function(idx, elem) {
         tags.push($(elem).text());
     });
-    tags = tags.join(', ');
+    var tags_str = tags.join(', ');
     var selected = []
     $('.selected').each(function(index, elem) {
         selected.push($(elem).attr("thumb_id"))
-        $(elem).attr('tags', tags)
+        $(elem).attr('tags', tags_str)
     })
     $.ajax({
-        type: "GET",
-        data: "selected=" + selected.join(',') + "&" + "tags=" + tags,
-        url: "/cassad/addtags",
+        type: "POST",
+        data: JSON.stringify({ selected: selected, tags: tags }),
+        url: "/cassad/api/tags-bulk/",
+	processData: false,
         timeout: 15000,
         success: function(d) {
             $('.selected').removeClass('selected')
@@ -134,9 +135,10 @@ $('#del-button').live('click', function() {
     if (!confirm('Are you sure you want to delete selected items?'))
         return false;
     $.ajax({
-        type: "GET",
-        data: "selected=" + selected.join(','),
-        url: "/cassad/delete",
+        type: "POST",
+        data: JSON.stringify({ selected: selected, tags: ["deleted"] }),
+	processData: false,
+        url: "/cassad/api/tags-bulk/",
         timeout: 15000,
         success: function(d) {
             $('.selected').remove()
